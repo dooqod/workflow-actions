@@ -76,7 +76,7 @@ jobs:
           echo "Discovering the helm set:"
           echo "HELM_SET_ADDON=' '" >> $GITHUB_OUTPUT
           if [[ ${{ inputs.SERVICE_DOCKER_REPOSITORY != '' }} ]]; then
-            echo "HELM_SET_ADDON=${{ steps.helmset.outputs.HELM_SET_ADDON }} --set 'image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }}' " >> $GITHUB_OUTPUT
+            echo "HELM_SET_ADDON=\"${{ steps.helmset.outputs.HELM_SET_ADDON }} --set \'image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }}\' \"  " >> $GITHUB_OUTPUT
           fi
           if [[ ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ]]; then
             echo "HELM_SET_ADDON=${{ steps.helmset.outputs.HELM_SET_ADDON }} --set 'image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}' " >> $GITHUB_OUTPUT
