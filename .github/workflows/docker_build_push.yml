@@ -1,4 +1,4 @@
-name: docker-build-push
+name: docker_build_push
 
 on:
   workflow_call:
@@ -13,11 +13,16 @@ on:
         required: true
       NPM_TOKEN: 
         required: true
+    # Map the workflow outputs to job outputs
+    outputs:
+      git_sha_short:
+        description: "The short sha of git branch"
+        value: ${{ jobs.docker_build_push.outputs.sha_short }}
 
 jobs:
-  docker-build-push:
+  docker_build_push:
     outputs:
-      git_branch_sha_short: ${{ steps.extract_branch.outputs.sha_short }}
+      sha_short: ${{ steps.extract_branch.outputs.sha_short }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

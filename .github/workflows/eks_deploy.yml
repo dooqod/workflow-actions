@@ -1,0 +1,97 @@
+name: eks_deploy
+
+on:
+  workflow_call:
+    inputs:
+      EKS_CLUSTER_NAME: 
+        required: true
+        type: string
+      SERVICE_NAME:
+        required: true
+        type: string
+      SERVICE_IMAGE_TAG:
+        required: true
+        type: string
+      SERVICE_K8_NAMESPACE:
+        required: true
+        type: string
+      SERVICE_MAX_REPLICA:
+        required: false
+        type: number
+        default: 1
+      SERVICE_DOCKER_REPOSITORY: 
+        required: false
+        type: string
+        default: ''
+      SERVICE_DOCKER_IMAGE_TAG:
+        required: false
+        type: string
+        default: ''
+    secrets: 
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      DOPPLER_TOKEN:
+        required: true
+
+jobs:
+  eks_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set Stage
+        id: setstage
+        run: |
+          echo "Discovering the environment stage:"
+          echo "SERVICE_ENV=pr" >> $GITHUB_OUTPUT
+          if [[ ${{ github.ref == 'refs/heads/main' }} ]]; then
+            echo "SERVICE_ENV=prd" >> $GITHUB_OUTPUT
+          fi
+          if [[ ${{ github.ref == 'refs/heads/develop' }} ]]; then
+            echo "SERVICE_ENV=dev" >> $GITHUB_OUTPUT
+          fi
+          echo "Environment stage is set:"
+          echo "${{ GITHUB_OUTPUT }}"
+
+      - name: kubeconfing
+        id: kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ inputs.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+          echo "KUBE_CONFIG_DATA=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT
+
+      # Configuring extra helm --set addons    
+      - name: Helm Set
+        id: helmset
+        run: |
+          echo "Discovering the helm set:"
+          echo "HELM_SET_ADDON=' '" >> $GITHUB_OUTPUT
+          if [[ ${{ inputs.SERVICE_DOCKER_REPOSITORY != '' }} ]]; then
+            echo "HELM_SET_ADDON=${{ steps.helmset.outputs.HELM_SET_ADDON }} --set 'image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }}' " >> $GITHUB_OUTPUT
+          fi
+          if [[ ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ]]; then
+            echo "HELM_SET_ADDON=${{ steps.helmset.outputs.HELM_SET_ADDON }} --set 'image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}' " >> $GITHUB_OUTPUT
+          fi
+          echo "Helm additional set:"
+          echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
+
+      # - name: Deploy ${{ inputs.SERVICE_NAME }} to kubernetes namespace ${{ inputs.SERVICE_K8_NAMESPACE }}
+      #   id: eksdeploy
+      #   if: ${{ success() }}
+      #   uses: koslib/helm-eks-action@v1.26.0
+      #   env:
+      #     KUBE_CONFIG_DATA: ${{ steps.kubeconfig.outputs.KUBE_CONFIG_DATA }}
+      #   with:
+      #     command: helm upgrade ${{ inputs.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ inputs.SERVICE_K8_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ inputs.SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ secrets.DOCKERHUB_USERNAME }},imageCredentials.password=${{ secrets.DOCKERHUB_TOKEN }},dopplerToken=${{ secrets.DOPPLER_TOKEN }}" ${{ steps.helmset.outputs.HELM_SET_ADDON }}
