@@ -45,12 +45,12 @@ jobs:
   eks_deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      # - name: AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Set Stage
         id: setstage
@@ -66,11 +66,11 @@ jobs:
           echo "Environment stage is set:"
           echo "${{ GITHUB_OUTPUT }}"
 
-      - name: kubeconfing
-        id: kubeconfig
-        run: |
-          aws eks update-kubeconfig --name ${{ inputs.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
-          echo "KUBE_CONFIG_DATA=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT
+      # - name: kubeconfing
+      #   id: kubeconfig
+      #   run: |
+      #     aws eks update-kubeconfig --name ${{ inputs.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+      #     echo "KUBE_CONFIG_DATA=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT
 
       # Configuring extra helm --set addons    
       - name: Helm Set
