@@ -9,9 +9,6 @@ on:
       SERVICE_NAME:
         required: true
         type: string
-      SERVICE_IMAGE_TAG:
-        required: true
-        type: string
       SERVICE_K8_NAMESPACE:
         required: true
         type: string
