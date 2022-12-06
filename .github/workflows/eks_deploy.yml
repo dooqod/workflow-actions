@@ -106,6 +106,7 @@ jobs:
       - name: Helm Test
         id: helmtest
         run: |
+           echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
            echo "${{ steps.helmset.outputs.HELM_SET_HAJOX }}"
 
 
