@@ -51,13 +51,14 @@ jobs:
         id: setstage
         run: |
           echo "Discovering the environment stage:"
-          echo "SERVICE_ENV=pr" >> $GITHUB_OUTPUT
+          SERVICE_ENV_VALUE="pr"
           if ${{ github.ref == 'refs/heads/main' }} ; then
-            echo "SERVICE_ENV=prd" >>$GITHUB_OUTPUT
+            SERVICE_ENV_VALUE="prd"
           fi
           if ${{ github.ref == 'refs/heads/develop' }} ; then
-            echo "SERVICE_ENV=dev" >>$GITHUB_OUTPUT
+            SERVICE_ENV_VALUE="dev"
           fi
+          echo "SERVICE_ENV=$(echo $SERVICE_ENV_VALUE)" >>$GITHUB_OUTPUT
           echo "Environment stage is set: ${{ steps.setstage.outputs.SERVICE_ENV }}"
 
       # - name: kubeconfing
