@@ -101,6 +101,7 @@ jobs:
           echo "${HELM_SET_STR}"
           echo $HELM_SET_STR
           echo 'HELM_SET_ADDON=${HELM_SET_STR}' >> $GITHUB_OUTPUT
+          echo 'HELM_SET_HAJOX=hajox' >> $GITHUB_OUTPUT
           echo "Helm additional set:"
          
       - name: Helm Test
@@ -109,6 +110,7 @@ jobs:
         run: |
            echo "Barev" 
            echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
+           echo "${{ steps.helmset.outputs.HELM_SET_HAJOX }}"
 
 
       # - name: Deploy ${{ inputs.SERVICE_NAME }} to kubernetes namespace ${{ inputs.SERVICE_K8_NAMESPACE }}
