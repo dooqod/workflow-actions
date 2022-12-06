@@ -106,7 +106,6 @@ jobs:
          
       - name: Helm Test
         id: helmtest
-        shell: bash
         run: |
            echo "Barev" 
            a=${{ steps.helmset.outputs.HELM_SET_ADDON }}
