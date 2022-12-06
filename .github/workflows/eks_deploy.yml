@@ -100,8 +100,8 @@ jobs:
           echo "AVAR"
           echo "${HELM_SET_STR}"
           echo $HELM_SET_STR
-          echo 'HELM_SET_ADDON=${HELM_SET_STR}' >> $GITHUB_OUTPUT
-          echo 'HELM_SET_HAJOX=hajox' >> $GITHUB_OUTPUT
+          # echo "HELM_SET_ADDON=${HELM_SET_STR}" >> $GITHUB_OUTPUT
+          echo "HELM_SET_HAJOX=hajox" >> $GITHUB_OUTPUT
           echo "Helm additional set:"
          
       - name: Helm Test
@@ -109,7 +109,7 @@ jobs:
         shell: bash
         run: |
            echo "Barev" 
-           echo ${{ steps.helmset.outputs.HELM_SET_ADDON }}
+           #  echo ${{ steps.helmset.outputs.HELM_SET_ADDON }}
            echo ${{ steps.helmset.outputs.HELM_SET_HAJOX }}
 
 
