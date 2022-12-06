@@ -107,10 +107,9 @@ jobs:
       - name: Helm Test
         id: helmtest
         run: |
-           echo "Barev" 
            a=${{ steps.helmset.outputs.HELM_SET_ADDON }}
            echo $a
-           echo ${{ steps.helmset.outputs.HELM_SET_HAJOX }}
+           echo ${{ steps.helmset.outputs.* }}
 
 
       # - name: Deploy ${{ inputs.SERVICE_NAME }} to kubernetes namespace ${{ inputs.SERVICE_K8_NAMESPACE }}
