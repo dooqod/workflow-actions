@@ -109,7 +109,8 @@ jobs:
         shell: bash
         run: |
            echo "Barev" 
-           echo ${{ steps.helmset.outputs.HELM_SET_ADDON }}
+           a=${{ steps.helmset.outputs.HELM_SET_ADDON }}
+           echo $a
            echo "${{ steps.helmset.outputs.HELM_SET_HAJOX }}"
 
 
