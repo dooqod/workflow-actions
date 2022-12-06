@@ -91,10 +91,10 @@ jobs:
           echo "Discovering the helm set:"
           HELM_SET_STR=""
           if [[ ${{ inputs.SERVICE_DOCKER_REPOSITORY != '' }} ]]; then
-            HELM_SET_STR=" ${HELM_SET_STR}  --set image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }} "
+            HELM_SET_STR=" ${HELM_SET_STR}  --set image.repository="${{ inputs.SERVICE_DOCKER_REPOSITORY }}"'"
           fi
           if [[ ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ]]; then
-            HELM_SET_STR=" ${HELM_SET_STR}  --set image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }} "
+            HELM_SET_STR=" ${HELM_SET_STR}  --set 'image.tag="${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}"'"
           fi
           echo "HELM_SET_ADDON=${HELM_SET_STR}" >> $GITHUB_OUTPUT
           echo "Helm additional set:"
