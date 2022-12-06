@@ -87,6 +87,7 @@ jobs:
 
       - name: Helm Set
         id: helmset
+        shell: bash
         run: |
           echo "Discovering the helm set:"
           HELM_SET_STR=""
