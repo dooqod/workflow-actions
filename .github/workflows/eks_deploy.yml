@@ -100,9 +100,9 @@ jobs:
           echo "AVAR"
           echo "${HELM_SET_STR}"
           echo $HELM_SET_STR
-          echo "HELM_SET_ADDON=$HELM_SET_STR" >> $GITHUB_OUTPUT
-          echo "Helm additional set:"
-          echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
+          # echo "HELM_SET_ADDON=$HELM_SET_STR" >> $GITHUB_OUTPUT
+          # echo "Helm additional set:"
+          # echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
 
       # - name: Deploy ${{ inputs.SERVICE_NAME }} to kubernetes namespace ${{ inputs.SERVICE_K8_NAMESPACE }}
       #   id: eksdeploy
