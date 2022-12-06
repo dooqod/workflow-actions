@@ -97,9 +97,10 @@ jobs:
           if [[ ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ]]; then
             HELM_SET_STR+=' --set "image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}"'
           fi
+          echo "AVAR"
           echo "${HELM_SET_STR}"
           echo $HELM_SET_STR
-          echo "HELM_SET_ADDON=${HELM_SET_STR}" >> $GITHUB_OUTPUT
+          echo "HELM_SET_ADDON=$HELM_SET_STR" >> $GITHUB_OUTPUT
           echo "Helm additional set:"
           echo "${{ steps.helmset.outputs.HELM_SET_ADDON }}"
 
