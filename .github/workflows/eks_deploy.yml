@@ -19,11 +19,9 @@ on:
       SERVICE_DOCKER_REPOSITORY: 
         required: false
         type: string
-        default: ''
       SERVICE_DOCKER_IMAGE_TAG:
         required: false
         type: string
-        default: ''
     secrets: 
       AWS_ACCESS_KEY_ID:
         required: true
@@ -96,10 +94,12 @@ jobs:
           if [[ ${{ inputs.SERVICE_DOCKER_REPOSITORY != '' }} ]]; then
             HELM_SET_STR+=" --set 'image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }}'"
           fi
+
           echo "SERVICE_DOCKER_IMAGE_TAG=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}"
           if [[ ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ]]; then
             HELM_SET_STR+=" --set 'image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}'"
           fi
+
           echo "HELM_SET_STR value is: ${HELM_SET_STR}"
           echo "HELM_SET_ADDON=$(echo $HELM_SET_STR)" >>$GITHUB_OUTPUT
          
