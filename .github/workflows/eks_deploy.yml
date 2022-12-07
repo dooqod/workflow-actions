@@ -26,6 +26,7 @@ jobs:
           doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
         env:
           DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}
+          DOPPLER_PROJECT: ${{ secrets.SERVICE_NAME }}
 
 
       # Github actions doppler secrets set to env for develop
