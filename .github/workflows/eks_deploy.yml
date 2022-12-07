@@ -14,9 +14,7 @@ jobs:
       - name: Login in Doppler, set Doppler env from github action project
         if: endsWith(github.ref, '/main')
         run: |
-          doppler secrets download --no-file --format=docker | grep ^AWS_EKS_NAMESPACE >> $GITHUB_ENV;
-          doppler secrets download --no-file --format=docker | grep ^SERVICE_SUBDOMAIN >> $GITHUB_ENV;
-          doppler secrets download --no-file --format=docker | grep ^SERVICE_MAX_REPLICA >> $GITHUB_ENV;
+          doppler secrets download --no-file --format=docker | grep ^HELM_CONFIG_ >> $GITHUB_ENV;
         env:
           DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}
 
@@ -25,9 +23,7 @@ jobs:
       - name: Login in Doppler, set Doppler env from service project
         if: endsWith(github.ref, '/develop')
         run: |
-          doppler secrets download --no-file --format=docker | grep ^AWS_EKS_NAMESPACE >> $GITHUB_ENV;
-          doppler secrets download --no-file --format=docker | grep ^SERVICE_SUBDOMAIN >> $GITHUB_ENV;
-          doppler secrets download --no-file --format=docker | grep ^SERVICE_MAX_REPLICA >> $GITHUB_ENV;
+          doppler secrets download --no-file --format=docker | grep ^HELM_CONFIG_ >> $GITHUB_ENV;
         env:
           DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_DEV }}
       
@@ -62,7 +58,7 @@ jobs:
       #   id: create_subdomain
       #   if: ${{ success() && secrets.SERVICE_SUBDOMAIN != '' }}
       #   run: |
-      #     echo "Creating subdomain ${{ env.SERVICE_SUBDOMAIN }} for service ${{ secrets.SERVICE_NAME }} under Cloudflare "
+      #     echo "Creating subdomain ${{ env.HELM_CONFIG_SERVICE_SUBDOMAIN }} for service ${{ secrets.SERVICE_NAME }} under Cloudflare "
       #     output=$(python cf-utils.py)
       #     echo "SUBDOMAIN_URL=$(echo -n $output)" >> $GITHUB_OUTPUT
       #     echo "Subdomain for service ${{ secrets.SERVICE_NAME }} created."
@@ -70,7 +66,7 @@ jobs:
       #     CF_TOKEN: ${{ secrets.CF_TOKEN }}
       #     CF_EMAIL: ${{ secrets.CF_EMAIL }}
       #     CF_DOMAIN: ${{ secrets.CF_DOMAIN }}
-      #     SUBDOMAIN: ${{ env.SERVICE_SUBDOMAIN }}
+      #     SUBDOMAIN: ${{ env.HELM_CONFIG_SERVICE_SUBDOMAIN }}
       #     IP: ${{ steps.kubeconfig.outputs.KUBE_HOSTNAME }}
 
       # - name: Deploy ${{ secrets.SERVICE_NAME }} to kubernetes namespace ${{ secrets.AWS_EKS_NAMESPACE }}
@@ -80,4 +76,4 @@ jobs:
       #   env:
       #     KUBE_CONFIG_DATA: ${{ steps.kubeconfig.outputs.KUBE_CONFIG_DATA }}
       #   with:
-      #     command: helm upgrade ${{ secrets.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ env.AWS_EKS_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ env.SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ secrets.DOCKERHUB_USERNAME }},imageCredentials.password=${{ secrets.DOCKERHUB_TOKEN }},dopplerToken=${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}" --set "image.repository=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVICE_NAME }}" --set "image.tag=${{ ${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }} }}"
+      #     command: helm upgrade ${{ secrets.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ env.HELM_CONFIG_EKS_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ env.HELM_CONFIG_SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ secrets.DOCKERHUB_USERNAME }},imageCredentials.password=${{ secrets.DOCKERHUB_TOKEN }},dopplerToken=${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}" --set "image.repository=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVICE_NAME }}" --set "image.tag=${{ ${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }} }}"
