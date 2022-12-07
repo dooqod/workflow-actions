@@ -15,7 +15,10 @@ jobs:
         if: endsWith(github.ref, '/main')
         run: |
           doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
-          doppler logout
+          echo "DOPPLER_CONFIG=" >> $GITHUB_ENV
+          echo "DOPPLER_PROJECT=" >> $GITHUB_ENV
+          echo "DOPPLER_TOKEN=" >> $GITHUB_ENV
+          echo "DOPPLER_ENVIRONMENT=" >> $GITHUB_ENV
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
 
@@ -24,9 +27,12 @@ jobs:
         if: endsWith(github.ref, '/main')
         run: |
           doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+          echo "DOPPLER_CONFIG=" >> $GITHUB_ENV
+          echo "DOPPLER_PROJECT=" >> $GITHUB_ENV
+          echo "DOPPLER_TOKEN=" >> $GITHUB_ENV
+          echo "DOPPLER_ENVIRONMENT=" >> $GITHUB_ENV
         env:
           DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}
-          DOPPLER_PROJECT: ${{ secrets.SERVICE_NAME }}
 
 
       # Github actions doppler secrets set to env for develop
