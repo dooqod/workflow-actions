@@ -15,6 +15,7 @@ jobs:
         if: endsWith(github.ref, '/main')
         run: |
           doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+          doppler logout
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
 
