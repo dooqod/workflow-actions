@@ -14,20 +14,20 @@ jobs:
       - uses: dopplerhq/cli-action@v2
 
       # Use doppler PRD token for main
-      - name: Login in Doppler and set github action env vars
-        if: endsWith(github.ref, '/main')
-        run: |
-          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
+      # - name: Login in Doppler and set github action env vars
+      #   if: endsWith(github.ref, '/main')
+      #   run: |
+      #     doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+      #   env:
+      #     DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
 
       # Use doppler DEV token for develop
-      - name:  Login in Doppler and set github action env vars
-        if: endsWith(github.ref, '/develop')
-        run: |
-          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_DEV }}
+      # - name:  Login in Doppler and set github action env vars
+      #   if: endsWith(github.ref, '/develop')
+      #   run: |
+      #     doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+      #   env:
+      #     DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_DEV }}
 
       - name: Docker meta
         id: meta
@@ -35,7 +35,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ${{ env.DOCKERHUB_USERNAME }}/${{  secrets.SERVICE_NAME }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{  secrets.SERVICE_NAME }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=latest
@@ -55,8 +55,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
         id: docker_build
@@ -66,7 +66,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            NPM_TOKEN=${{ env.NPM_TOKEN }}
+            NPM_TOKEN=${{ secrets.NPM_TOKEN }}
           tags: ${{ steps.meta.outputs.tags }}
           
       - name: Image digest
