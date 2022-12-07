@@ -2,34 +2,32 @@ name: docker_build_push
 
 on:
   workflow_call:
-    inputs:
-      SERVICE_NAME:
-        required: true
-        type: string
-    secrets:
-      DOPPLER_TOKEN:
-        required: true
-    outputs:
-      git_sha_short:
-        description: "The short sha of git branch"
-        value: ${{ jobs.docker_build_push.outputs.sha_short }}
 
 jobs:
   docker_build_push:
-    outputs:
-      sha_short: ${{ steps.extract_branch.outputs.sha_short }}
     runs-on: ubuntu-latest
     steps:
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - uses: dopplerhq/cli-action@v1
-      - name: Login in Doppler
+
+      # Use doppler PRD token for main
+      - name: Login in Doppler and set github action env vars
+        if: endsWith(github.ref, '/main')
         run: |
           doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      # Use doppler DEV token for develop
+      - name:  Login in Doppler and set github action env vars
+        if: endsWith(github.ref, '/develop')
+        run: |
+          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_DEV }}
 
       - name: Docker meta
         id: meta
@@ -37,18 +35,12 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ${{ env.DOCKERHUB_USERNAME }}/${{  inputs.SERVICE_NAME }}
+            ${{ env.DOCKERHUB_USERNAME }}/${{  secrets.SERVICE_NAME }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=latest
             type=raw,value={{branch}}-latest
             type=raw,value={{sha}}
-
-      - name: Extract branch name
-        id: extract_branch
-        shell: bash
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

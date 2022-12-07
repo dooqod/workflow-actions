@@ -2,104 +2,100 @@ name: eks_deploy
 
 on:
   workflow_call:
-    inputs:
-      EKS_CLUSTER_NAME: 
-        required: true
-        type: string
-      SERVICE_NAME:
-        required: true
-        type: string
-      SERVICE_K8_NAMESPACE:
-        required: true
-        type: string
-      SERVICE_MAX_REPLICA:
-        required: false
-        type: number
-        default: 1
-      SERVICE_DOCKER_REPOSITORY: 
-        required: false
-        type: string
-      SERVICE_DOCKER_IMAGE_TAG:
-        required: false
-        type: string
-    secrets: 
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      AWS_REGION:
-        required: true
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
-      DOPPLER_TOKEN:
-        required: true
 
 jobs:
   eks_deploy:
     runs-on: ubuntu-latest
     steps:
+
+      - uses: dopplerhq/cli-action@v1
+
+      # Github actions doppler secrets set to env for main
+      - name: Login in Doppler, set Doppler env from github action project
+        if: endsWith(github.ref, '/main')
+        run: |
+          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
+
+      # Service doppler secrets set to env for main
+      - name: Login in Doppler, set Doppler env from service project
+        if: endsWith(github.ref, '/main')
+        run: |
+          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+        env:
+          DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}
+
+
+      # Github actions doppler secrets set to env for develop
+      - name: Login in Doppler, set Doppler env from github action project
+        if: endsWith(github.ref, '/develop')
+        run: |
+          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_DEV }}
+
+      # Service doppler secrets set to env for develop
+      - name: Login in Doppler, set Doppler env from service project
+        if: endsWith(github.ref, '/develop')
+        run: |
+          doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
+        env:
+          DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN_PRD }}
+
+      - name: Test Doppler 2 envs
+        id: test_doppler
+        shell: bash
+        run: |
+          echo "AVAR::Service is:  ${{ secrets.SERVICE_NAME }}"
+          echo "AVAR::Service DEMO_SECRET is:  ${{ env.DEMO_SECRET }}" 
+      
+      # We have one AWS account for github ci, and there is no differentiation based on env type dev or prd
       # - name: AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.AWS_REGION }}
+      #     aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+      #     role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
 
-      - name: Set Stage
-        id: setstage
-        run: |
-          echo "Discovering the environment stage:"
-          SERVICE_ENV_VALUE="pr"
-          if ${{ github.ref == 'refs/heads/main' }} ; then
-            SERVICE_ENV_VALUE="prd"
-          fi
-          if ${{ github.ref == 'refs/heads/develop' }} ; then
-            SERVICE_ENV_VALUE="dev"
-          fi
-          echo "SERVICE_ENV=$(echo $SERVICE_ENV_VALUE)" >>$GITHUB_OUTPUT
-          echo "Environment stage is set: ${{ steps.setstage.outputs.SERVICE_ENV }}"
+
+      # - name: Extract branch short sha
+      #   id: git_extract_branch_sha
+      #   shell: bash
+      #   run: |
+      #     echo "REPO_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      #     echo "Output for sha_short is: ${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }}"
 
       # - name: kubeconfing
       #   id: kubeconfig
       #   run: |
-      #     aws eks update-kubeconfig --name ${{ inputs.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+      #     aws eks update-kubeconfig --name ${{ env.AWS_EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
       #     echo "KUBE_CONFIG_DATA=$(cat ~/.kube/config | base64)" >> $GITHUB_OUTPUT
+          
+      #     # TODO: We need to check if we can use RBAC to allow access this
+      #     # echo "KUBE_HOSTNAME=$(kubectl get svc ingress-nginx-controller -n ingress-nginx -o json | jq -r '.status.loadBalancer.ingress[0].hostname')" >> $GITHUB_OUTPUT
 
-      # Configuring extra helm --set addons 
-      - name: Helm Set
-        id: helmset
-        shell: bash
-        run: |
-          echo "Discovering the helm set:"
-          HELM_SET_STR=""
-        
-          echo "SERVICE_DOCKER_REPOSITORY=${{ inputs.SERVICE_DOCKER_REPOSITORY }}"
-          if ${{ inputs.SERVICE_DOCKER_REPOSITORY != '' }} ; then
-            HELM_SET_STR+=" --set 'image.repository=${{ inputs.SERVICE_DOCKER_REPOSITORY }}'"
-          fi
+      # - name: Create subdomain if service has that settings under Doppler
+      #   id: create_subdomain
+      #   if: ${{ success() && secrets.SERVICE_SUBDOMAIN != '' }}
+      #   run: |
+      #     echo "Creating subdomain ${{ secrets.SERVICE_SUBDOMAIN }} for service ${{ secrets.SERVICE_NAME }} under Cloudflare "
+      #     output=$(python cf-utils.py)
+      #     echo "SUBDOMAIN_URL=$(echo -n $output)" >> $GITHUB_OUTPUT
+      #     echo "Subdomain for service ${{ secrets.SERVICE_NAME }} created."
+      #   env:
+      #     CF_TOKEN: ${{ env.CF_TOKEN }}
+      #     CF_EMAIL: ${{ env.CF_EMAIL }}
+      #     CF_DOMAIN: ${{ env.CF_DOMAIN }}
+      #     SUBDOMAIN: ${{ secrets.SERVICE_SUBDOMAIN }}
+      #     IP: ${{ steps.kubeconfig.outputs.KUBE_HOSTNAME }}
 
-          echo "SERVICE_DOCKER_IMAGE_TAG=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}"
-          if ${{ inputs.SERVICE_DOCKER_IMAGE_TAG != '' }} ; then
-            HELM_SET_STR+=" --set 'image.tag=${{ inputs.SERVICE_DOCKER_IMAGE_TAG }}'"
-          fi
-
-          echo "HELM_SET_STR value is: ${HELM_SET_STR}"
-          echo "HELM_SET_ADDON=$(echo $HELM_SET_STR)" >>$GITHUB_OUTPUT
-         
-      - name: Test
-        id: test
-        run: |
-           echo "Stage constructed: ${{ steps.setstage.outputs.SERVICE_ENV }}  "
-           echo "Helm set constructed: ${{ steps.helmset.outputs.HELM_SET_ADDON }}"
-
-
-      # - name: Deploy ${{ inputs.SERVICE_NAME }} to kubernetes namespace ${{ inputs.SERVICE_K8_NAMESPACE }}
+      # - name: Deploy ${{ secrets.SERVICE_NAME }} to kubernetes namespace ${{ env.AWS_EKS_NAMESPACE }}
       #   id: eksdeploy
-      #   if: ${{ success() }}
+      #   if: ${{ success() && env.AWS_EKS_NAMESPACE != '' &&  secrets.SERVICE_NAME != '' }}
       #   uses: koslib/helm-eks-action@v1.26.0
       #   env:
       #     KUBE_CONFIG_DATA: ${{ steps.kubeconfig.outputs.KUBE_CONFIG_DATA }}
       #   with:
-      #     command: helm upgrade ${{ inputs.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ inputs.SERVICE_K8_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ inputs.SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ secrets.DOCKERHUB_USERNAME }},imageCredentials.password=${{ secrets.DOCKERHUB_TOKEN }},dopplerToken=${{ secrets.DOPPLER_TOKEN }}" ${{ steps.helmset.outputs.HELM_SET_ADDON }}
+      #     command: helm upgrade ${{ secrets.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ env.AWS_EKS_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ env.SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ env.DOCKERHUB_USERNAME }},imageCredentials.password=${{ env.DOCKERHUB_TOKEN }},dopplerToken=${{ env.SERVICE_DOPPLER_TOKEN }}" --set "image.repository=${{ env.DOCKERHUB_USERNAME }}/${{ secrets.SERVICE_NAME }}" --set "image.tag=${{ ${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }} }}"
