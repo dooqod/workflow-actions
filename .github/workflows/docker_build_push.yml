@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dopplerhq/cli-action@v1
+      - uses: dopplerhq/cli-action@v2
 
       # Use doppler PRD token for main
       - name: Login in Doppler and set github action env vars
