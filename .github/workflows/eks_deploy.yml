@@ -71,7 +71,7 @@ jobs:
       # Deploying into k8s
 
       - name: ENV = DEV | Deploy ${{ secrets.SERVICE_NAME }} to kubernetes namespace ${{ secrets.AWS_EKS_NAMESPACE }}
-        id: eksdeploy
+        id: eksdeploy_dev
         if: secrets.AWS_EKS_NAMESPACE != '' &&  secrets.SERVICE_NAME != ''
         uses: koslib/helm-eks-action@v1.26.0
         env:
@@ -80,7 +80,7 @@ jobs:
           command: helm upgrade ${{ secrets.SERVICE_NAME }} ./helm --install --wait --atomic --namespace=${{ env.HELM_CONFIG_EKS_NAMESPACE }} --create-namespace --set "autoscaling.maxReplicas=${{ env.HELM_CONFIG_SERVICE_MAX_REPLICA || 1 }},imageCredentials.username=${{ secrets.DOCKERHUB_USERNAME }},imageCredentials.password=${{ secrets.DOCKERHUB_TOKEN }},dopplerToken=${{ secrets.SERVICE_DOPPLER_TOKEN_DEV }}" --set "image.repository=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVICE_NAME }}" --set "image.tag=${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }}"
 
       - name: ENV = PRD | Deploy ${{ secrets.SERVICE_NAME }} to kubernetes namespace ${{ secrets.AWS_EKS_NAMESPACE }}
-        id: eksdeploy
+        id: eksdeploy_prd
         if: secrets.AWS_EKS_NAMESPACE != '' &&  secrets.SERVICE_NAME != ''
         uses: koslib/helm-eks-action@v1.26.0
         env:
