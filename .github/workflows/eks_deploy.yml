@@ -57,7 +57,8 @@ jobs:
           # echo 'KUBE_CONFIG_DATA<<EOF' >> $GITHUB_OUTPUT
           # $(cat ~/.kube/config | base64) >> $GITHUB_OUTPUT
           # echo 'EOF' >> $GITHUB_OUTPUT
-          echo -e "KUBE_CONFIG_DATA<<EOF\n$(cat ~/.kube/config | base64)\nEOF" >> $GITHUB_OUTPUT
+          # echo -e "KUBE_CONFIG_DATA<<EOF\n$(cat ~/.kube/config | base64)\nEOF" >> $GITHUB_OUTPUT
+          echo "KUBE_CONFIG_DATA<<EOF"$'\n'"$(cat ~/.kube/config | base64)"$'\n'EOF
           if ${{ env.HELM_CONFIG_SERVICE_SUBDOMAIN != '' }} ; then
             echo "KUBE_HOSTNAME=$(kubectl get svc ingress-nginx-controller -n ingress-nginx -o json | jq -r '.status.loadBalancer.ingress[0].hostname')" >> $GITHUB_OUTPUT
           fi
