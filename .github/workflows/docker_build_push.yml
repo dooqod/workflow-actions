@@ -13,22 +13,6 @@ jobs:
 
       - uses: dopplerhq/cli-action@v2
 
-      # Use doppler PRD token for main
-      # - name: Login in Doppler and set github action env vars
-      #   if: endsWith(github.ref, '/main')
-      #   run: |
-      #     doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
-      #   env:
-      #     DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
-
-      # Use doppler DEV token for develop
-      # - name:  Login in Doppler and set github action env vars
-      #   if: endsWith(github.ref, '/develop')
-      #   run: |
-      #     doppler secrets download --no-file --format=docker >> $GITHUB_ENV;
-      #   env:
-      #     DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_DEV }}
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
