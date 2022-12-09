@@ -36,6 +36,10 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume:  ${{ secrets.AWS_ASSUME_ROLE }}
 
+      - name: Identity Check
+        run: |
+          echo $(aws sts get-caller-identity)
+
 
       - name: Extract branch short sha
         id: git_extract_branch_sha
