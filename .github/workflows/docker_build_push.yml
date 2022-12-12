@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dopplerhq/cli-action@v2
+      # - uses: dopplerhq/cli-action@v2
 
       - name: Docker meta
         id: meta
