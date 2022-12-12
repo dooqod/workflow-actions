@@ -3,6 +3,26 @@ name: eks_deploy
 on:
   workflow_call:
     secrets:
+      AWS_ACCESS_KEY_ID:
+         required: true
+      AWS_REGION:
+         required: true
+      AWS_SECRET_ACCESS_KEY:
+         required: true
+      CF_DOMAIN:
+         required: false
+      CF_EMAIL:
+         required: false
+      CF_TOKEN: 
+         required: false
+      DOCKERHUB_TOKEN:
+         required: true
+      DOCKERHUB_USERNAME: 
+         required: true
+      KUBE_CONFIG_DATA: 
+         required: true
+      SERVICE_NAME:
+       required: true
       SERVICE_DOPPLER_TOKEN:
         required: true
 
