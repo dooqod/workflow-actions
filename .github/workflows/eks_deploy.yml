@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           echo "REPO_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "Output for sha_short is: ${ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }"
+          echo "Output for sha_short is: ${{ steps.git_extract_branch_sha.outputs.REPO_SHA_SHORT }}"
         
       # Get hostname  
       - name: Get hostname
