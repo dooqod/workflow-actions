@@ -4,19 +4,19 @@ on:
   workflow_call:
     secrets:
       AWS_ACCESS_KEY_ID:
-         required: true
+        required: true
       AWS_REGION:
-         required: true
+        required: true
       AWS_SECRET_ACCESS_KEY:
-         required: true
+        required: true
       DOCKERHUB_TOKEN:
-         required: true
+        required: true
       DOCKERHUB_USERNAME: 
-         required: true
+        required: true
       KUBE_CONFIG_DATA: 
-         required: true
+        required: true
       SERVICE_NAME:
-       required: true
+        required: true
       SERVICE_DOPPLER_TOKEN:
         required: true
 
