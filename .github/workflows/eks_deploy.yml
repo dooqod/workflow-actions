@@ -31,17 +31,10 @@ jobs:
 
       - uses: dopplerhq/cli-action@v2
 
-      - name: Test secret
-        run: |
-          echo ${{ secrets.SERVICE_DOPPLER_TOKEN }}
-
       # Service doppler secrets set to env for main
       - name: Login in Doppler, set Doppler env from github action project
         run: |
-          doppler secrets download --no-file --format=docker | grep ^HELM_CONFIG_ >> $GITHUB_ENV;
-        env:
-          DOPPLER_TOKEN: ${{ secrets.SERVICE_DOPPLER_TOKEN }}
-
+          doppler secrets download --no-file --format=docker --token="${{ secrets.SERVICE_DOPPLER_TOKEN  }}" | grep ^HELM_CONFIG_ >> $GITHUB_ENV;
       
       # We have one AWS account for github ci
       - name: AWS Credentials
