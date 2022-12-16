@@ -2,13 +2,13 @@ name: docker_build_push
 
 on:
   workflow_call:
-      secrets:
+    secrets:
       DOCKERHUB_USERNAME: 
-         required: true
+        required: true
       DOCKERHUB_TOKEN:
-         required: true
+        required: true
       SERVICE_NAME:
-       required: true
+        required: true
       NPM_TOKEN:
         required: true
 
