@@ -1,4 +1,4 @@
-name: docker_build_push
+name: docker_build_push_image
 
 on:
   workflow_call:
