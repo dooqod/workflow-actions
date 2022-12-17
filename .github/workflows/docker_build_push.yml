@@ -9,12 +9,10 @@ on:
         required: true
       DOCKERHUB_REPO:
         required: true
+      DOCKER_TARGET_PLATFORM:
+        required: true
       NPM_TOKEN:
         required: false
-    inputs:
-      DOCKER_TARGET_PLATFORM:
-        type: string
-        required: true
 
 jobs:
   docker_build_push:
@@ -42,12 +40,12 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: ${{ inputs.DOCKER_TARGET_PLATFORM }}
+          platforms: ${{ secrets.DOCKER_TARGET_PLATFORM }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          platforms: ${{ inputs.DOCKER_TARGET_PLATFORM }}
+          platforms: ${{ secrets.DOCKER_TARGET_PLATFORM }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -61,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: ${{ inputs.DOCKER_TARGET_PLATFORM }}
+          platforms: ${{ secrets.DOCKER_TARGET_PLATFORM }}
           push: true
           build-args: |
             NPM_TOKEN=${{ secrets.NPM_TOKEN }}
@@ -74,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: ${{ inputs.DOCKER_TARGET_PLATFORM }}
+          platforms: ${{ secrets.DOCKER_TARGET_PLATFORM }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
