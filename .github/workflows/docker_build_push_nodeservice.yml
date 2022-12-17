@@ -15,7 +15,7 @@ on:
         required: true
 
 jobs:
-  docker_build_push:
+  docker_build_push_nodeservice:
     runs-on: ubuntu-latest
     steps:
 
