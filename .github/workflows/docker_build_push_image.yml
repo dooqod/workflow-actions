@@ -11,8 +11,6 @@ on:
         required: true
       DOCKER_TARGET_PLATFORM:
         required: true
-      NPM_TOKEN:
-        required: false
 
 jobs:
   docker_build_push:
@@ -53,21 +51,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push with NPM token
-        if: ${{ secrets.NPM_TOKEN != "" }}
-        id: docker_build_with_npm_token
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: ${{ secrets.DOCKER_TARGET_PLATFORM }}
-          push: true
-          build-args: |
-            NPM_TOKEN=${{ secrets.NPM_TOKEN }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Build and push without npm token
-        if: ${{ secrets.NPM_TOKEN == "" }}
+      - name: Build and push
         id: docker_build_without_npm_token
         uses: docker/build-push-action@v3
         with:
