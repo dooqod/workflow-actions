@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and push with NPM token
         if: NPM_TOKEN != ""
-        id: docker_build
+        id: docker_build_with_npm_token
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build and push without npm token
         if: NPM_TOKEN == ""
-        id: docker_build
+        id: docker_build_without_npm_token
         uses: docker/build-push-action@v3
         with:
           context: .
