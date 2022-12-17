@@ -62,6 +62,13 @@ jobs:
             NPM_TOKEN=${{ secrets.NPM_TOKEN }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # Test meta outputs
+      - name: Extract branch short sha
+        id: meta_outputs
+        shell: bash
+        run: |
+          echo ${{ steps.meta.outputs }}
           
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
