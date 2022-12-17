@@ -61,6 +61,7 @@ jobs:
           build-args: |
             NPM_TOKEN=${{ secrets.NPM_TOKEN }}
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
